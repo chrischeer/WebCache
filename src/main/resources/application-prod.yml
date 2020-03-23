@@ -1,0 +1,6 @@
+server:
+  port: 8999
+
+webcache:
+  watchPath: /home/springcloud/mpaas/webcache/test
+  interval: 1000  # ms

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false" scan="true" scanPeriod="30 seconds">
+
+    <!--=========================================彩色日志配置 开始=====================================-->
+    <!-- 彩色日志依赖的渲染类 -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+    <conversionRule conversionWord="wex"
+                    converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
+    <conversionRule conversionWord="wEx"
+                    converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
+    <!-- 彩色日志格式 -->
+    <property name="CONSOLE_LOG_PATTERN"
+              value="${CONSOLE_LOG_PATTERN:-%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+    <!--=========================================彩色日志配置 结束=====================================-->
+
+
+    <!--=========================================property定义 开始=====================================-->
+    <!-- 文件输出格式 -->
+    <property name="PATTERN" value="%-12(%d{yyyy-MM-dd HH:mm:ss.SSS}) |-%-5level [%thread] %c [%L] -| %msg%n"/>
+    <!-- pro文件路径 -->
+    <property name="PRO_FILE_PATH" value="logs"/>
+    <property name="ERROR_FILE_PATH" value="errorlogs"/>
+    <!--=========================================property定义 结束=====================================-->
+
+
+    <!--=========================================appender定义 开始=====================================-->
+    <!-- Console 输出设置 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+    <appender name="LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--<file>${PRO_FILE_PATH}/prod-logs.log</file>-->
+        <!--滚动切割规则-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--按天切分-->
+            <fileNamePattern>${PRO_FILE_PATH}/%d{yyyy-MM-dd}/%i.log</fileNamePattern>
+            <!--保存天数-->
+            <MaxHistory>15</MaxHistory>
+            <!--上限大小-->
+            <totalSizeCap>300MB</totalSizeCap>
+            <!--每个日志文件大小-->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>20MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>${PATTERN}</pattern>
+        </layout>
+    </appender>
+
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--<file>${PRO_FILE_PATH}/prod-logs.log</file>-->
+        <!--滚动切割规则-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--按天切分-->
+            <fileNamePattern>${ERROR_FILE_PATH}/%d{yyyy-MM-dd}/%i.log</fileNamePattern>
+            <!--保存天数-->
+            <MaxHistory>15</MaxHistory>
+            <!--上限大小-->
+            <totalSizeCap>300MB</totalSizeCap>
+            <!--每个日志文件大小-->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>20MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>${PATTERN}</pattern>
+        </layout>
+
+        <!-- 所有error日志都在这里-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <!--=========================================appender定义 结束=====================================-->
+
+    <!-- FrameworkServlet日志-->
+    <!--<logger name="org.springframework" level="WARN"/>-->
+    <!-- mybatis日志打印-->
+    <!--<logger name="org.apache.ibatis" level="DEBUG"/>-->
+    <!--<logger name="java.sql" level="DEBUG"/>-->
+    <!--&lt;!&ndash;  项目 mapper 路径  console控制台显示sql语句：STDOUT.filter.level -> debug级别  &ndash;&gt;-->
+    <!--<logger name="com.limit.mapper" level="DEBUG"/>-->
+    <logger name="dao" level="DEBUG"/>
+
+    <!--=========================================不同环境定义规则 开始=====================================-->
+    <!-- 开发环境 -->
+    <springProfile name="default,test,dev">
+        <root level="info">
+            <appender-ref ref="CONSOLE"/>
+            <!--<appender-ref ref="ERROR_FILE"/>-->
+            <!--<appender-ref ref="LOG_FILE"/>-->
+        </root>
+    </springProfile>
+
+    <!--其他环境-->
+    <springProfile name="prod,subversion,win">
+        <!--设置打印级别，大小写无关：TRACE, DEBUG, INFO, WARN, ERROR, ALL 和 OFF-->
+        <root level="info">
+            <appender-ref ref="LOG_FILE"/>
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </root>
+    </springProfile>
+
+    <!--=========================================不同环境定义规则 结束=====================================-->
+</configuration>

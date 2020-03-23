@@ -1,0 +1,6 @@
+server:
+  port: 8999
+
+webcache:
+  watchPath: E:\cachetest\cache\test
+  interval: 1000  # ms
